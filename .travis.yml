@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t rof20004/react-test -f ./client/Dockerfile.dev .
+
+script:
+  - docker run rof20004/react-test npm test -- --coverage
+
+after_success:
+  - docker build -i rof20004/multi-client ./client
+  - docker build -i rof20004/multi-nginx ./nginx
+  - docker build -i rof20004/multi-server ./server
+  - docker build -i rof20004/multi-worker ./worker
+  # Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push rof20004/multi-client
+  - docker push rof20004/multi-nginx
+  - docker push rof20004/multi-server
+  - docker push rof20004/multi-worker
