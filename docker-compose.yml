@@ -5,6 +5,9 @@ services:
   redis:
     image: 'redis:latest'
   nginx:
+    depends_on:
+      - client
+      - api
     restart: always
     build:
       dockerfile: Dockerfile.dev
@@ -13,7 +16,6 @@ services:
       - '3050:80'
   api:
     depends_on:
-      - nginx
       - redis
       - postgres
     build:
